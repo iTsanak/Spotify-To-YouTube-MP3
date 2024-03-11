@@ -5,12 +5,13 @@ import time
 from dotenv import load_dotenv
 import os
 import pandas as pd
-#from .downloadvideos import DownloadVideosFromTitles
+from mp3Downloader import DownloadVideosFromTitles
+
 
 app = Flask(__name__)
 app.secret_key = "fzjmaonfow20"
 app.config['SESSION_COOKIE_NAME'] = 'spotify-login-session'
-TOKEN_INFO = 'token_info' # Dictionary key for the token info in the session
+TOKEN_INFO = 'token_info'                                   # Dictionary key for the token info in the session
 load_dotenv()
 
 '''
@@ -28,11 +29,11 @@ The code is in the request, so we use it to get the token info and save it to th
 '''
 @app.route('/redirect')
 def redirectPage():
-    sp_oauth = create_spotify_oauth()               # Create the SpotifyOauth object
+    sp_oauth = create_spotify_oauth()                       # Create the SpotifyOauth object
     session.clear()                     
-    code = request.args.get('code')                 # Get the code from the request
-    token_info = sp_oauth.get_access_token(code)    # Get the token info from the code
-    session[TOKEN_INFO] = token_info                # Save the token info to the session
+    code = request.args.get('code')                         # Get the code from the request
+    token_info = sp_oauth.get_access_token(code)            # Get the token info from the code
+    session[TOKEN_INFO] = token_info                        # Save the token info to the session
     return redirect(url_for('getTracks', _external=True))           
 
 @app.route('/logout')
@@ -53,14 +54,13 @@ def getTracks():
     playlists = sp.current_user_playlists()
     cur_playlist_id = None
     for playlist in playlists['items']:
-        
         if playlist['name'] == cur_playlist_name:
             cur_playlist_id = playlist['id']
             break
     
     all_songs = []
     iteration = 0
-    
+    track_names = []
     if cur_playlist_id is None:
         if cur_playlist_name == 'Liked Songs':
             while True:
@@ -69,6 +69,7 @@ def getTracks():
                 all_songs += items
                 if len(items) < 50:
                     break
+            track_names = [item['track']['name'] + " - " + item['track']['artists'][0]['name'] for item in all_songs] 
         else:
             print("Error: Playlist not found")
             return redirect(url_for('login', _external=False))
@@ -80,7 +81,15 @@ def getTracks():
             all_songs += items
             if len(items) < 50:
                 break
-    return str(len(all_songs)) # Get the user's saved tracks (50 at a time, starting from the first track
+        track_names = [item['track']['name'] + " - " + item['track']['artists'][0]['name'] for item in all_songs] 
+    df = pd.DataFrame(track_names, columns=["song names"]) 
+    try:
+        df.to_csv('songs.csv', index=False)
+        print("CSV file saved successfully.")
+    except Exception as e:
+        print("Error saving CSV file:", e)
+        return "Error saving CSV file."
+    return "Done"
 
 '''
 This function gets the token info from the session and returns the access token.
