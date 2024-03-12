@@ -83,12 +83,7 @@ def getTracks():
                 break
         track_names = [item['track']['name'] + " - " + item['track']['artists'][0]['name'] for item in all_songs] 
     df = pd.DataFrame(track_names, columns=["song names"]) 
-    try:
-        df.to_csv('songs.csv', index=False)
-        print("CSV file saved successfully.")
-    except Exception as e:
-        print("Error saving CSV file:", e)
-        return "Error saving CSV file."
+    df.to_csv('songs.csv', index=False)
     return "Done"
 
 '''

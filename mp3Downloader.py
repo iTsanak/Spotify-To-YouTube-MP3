@@ -25,19 +25,16 @@ def ScrapeVidId(search_query):
     response = session.get(URL)
     response.html.render(sleep=1)
     soup = BeautifulSoup(response.html.html, 'html.parser')
-    results = soup.find('a', id='video-title')
+    results = soup.find('a', id="video-title")
     return results['href'].split('/watch?v=')[1]
 
 def DownloadVideosFromIds(ids):
-    SAVE_PATH = str(os.path.join(Path.home(), 'Downloads', 'Songs'))
+    SAVE_PATH = str(os.path.join(Path.home(), "Downloads/songs"))
     try:
-        os.mkdir(SAVE_PATH, exist_ok=True)
+        os.mkdir(SAVE_PATH)
         print("Directory ", SAVE_PATH, " created")
-    except FileExistsError: #check this
+    except: #check this
         print("Directory ", SAVE_PATH, " already exists")
-    except Exception as e:
-        print("Error creating directory:", e)
-        return
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': SAVE_PATH + '/%(title)s.%(ext)s', #CHECK  THIS 
@@ -51,9 +48,12 @@ def DownloadVideosFromIds(ids):
         ydl.download(ids)
 
 def __main__():
-
+    
 	data = pandas.read_csv('songs.csv')
 	data = data['colummn'].tolist()
 	print("Found ", len(data), " songs!")
 	DownloadVideosFromTitles(data[0:1])
-__main__()
+
+
+if __name__ == '__main__':
+    __main__()

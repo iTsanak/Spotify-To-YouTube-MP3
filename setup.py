@@ -13,7 +13,7 @@ requires = [
 ]
 
 setup(
-    name='SpotifyToYoutubeMP3',
+    name='SpotifyToYoutube',
     version='1.0',
     description='An application that gets your Spotify songs goes to YouTube and downloads the YoutubeMP3 version',
     author='Iraklis Tsanachtsidis',
