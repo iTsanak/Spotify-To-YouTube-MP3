@@ -49,7 +49,7 @@ def getTracks():
     except:
         print("Error: User not signed in")
         return redirect(url_for('login', _external=False))  
-    cur_playlist_name = "API Testing Playlist"              # The name of the playlist to get the tracks from
+    cur_playlist_name = "Liked Songs"              # The name of the playlist to get the tracks from
     sp = spotipy.Spotify(auth=token_info['access_token'])   # Create a Spotify object with the access token
     playlists = sp.current_user_playlists()
     cur_playlist_id = None
@@ -69,7 +69,7 @@ def getTracks():
                 all_songs += items
                 if len(items) < 50:
                     break
-            track_names = [item['track']['name'] + " - " + item['track']['artists'][0]['name'] for item in all_songs] 
+            track_names = [item['track']['name'] + "," + item['track']['artists'][0]['name'] for item in all_songs] 
         else:
             print("Error: Playlist not found")
             return redirect(url_for('login', _external=False))
@@ -81,7 +81,7 @@ def getTracks():
             all_songs += items
             if len(items) < 50:
                 break
-        track_names = [item['track']['name'] + " - " + item['track']['artists'][0]['name'] for item in all_songs] 
+        track_names = [item['track']['name'] + "," + item['track']['artists'][0]['name'] for item in all_songs] 
     df = pd.DataFrame(track_names, columns=["song names"]) 
     df.to_csv('songs.csv', index=False)
     return "Done"
